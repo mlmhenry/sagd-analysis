@@ -5,8 +5,8 @@ Created on Wed Oct 19 11:32:38 2016
 @author: 502677886
 """
 
-from volume import Volume
-from online import Online
+from model.volume import Volume
+from model.online import Online
 
 
 class Injector:
@@ -38,5 +38,7 @@ class Injector:
     def getInjectorOnlineUnit(self):
         return(self.steamVolume.getUnit())
 
+    # display steam injector
     def displayInjector(self):
         print(self.steamVolume.getValue(), ': ', self.injectorOnline.getValue())
+

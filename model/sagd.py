@@ -5,9 +5,9 @@ Created on Wed Oct 19 13:36:39 2016
 @author: 502677886
 """
 
-from well import Well
-from injector import Injector
-from production import Production
+from model.well import Well
+from model.injector import Injector
+from model.production import Production
 
 
 class Sagd:
@@ -31,10 +31,14 @@ class Sagd:
         rate = (self.production.getOilVolume()/self.well.daysPerMonth()) * self.BARRELRATIO
         return(rate)
 
-    # barrel oil per millions
-    def barrelOilRatePM(self):
-        rate = self.production.getOilVolume() * self.BARRELRATIO/self.MILLIONS
-        return(rate)
+    # cummulative barrel oil volume per millions
+    def cummulativeBarrelOilVolume(self, cummulativeOilVolume):
+        cum = self.production.getOilVolume() * self.BARRELRATIO/self.MILLIONS
+        if cummulativeOilVolume == 0:
+            cummulativeOilVolume = cum
+        else:
+            cummulativeOilVolume += cum
+        return(cummulativeOilVolume)
 
     # cummulative oil volume produced
     def cummulativeOilVolume(self, cummulativeOilVolume):
@@ -50,15 +54,20 @@ class Sagd:
         rate = self.injector.getSteamVolume()/self.well.daysPerMonth()
         return(rate)
 
-    # barrel daily steam rate
+    # barrel daily steam rate bbl
     def barrelSteamRate(self):
         rate = (self.injector.getSteamVolume()/self.well.daysPerMonth()) * self.BARRELRATIO
         return(rate)
 
-    # barrel steam per millions
-    def barrelSteamRatePM(self):
-        rate = self.injector.getSteamVolume() * self.BARRELRATIO/self.MILLIONS
-        return(rate)
+    # cummulative barrel steam per millions mmbbl
+    def cummulativeBarrelSteamVolume(self, cummulativeSteamVolume):
+        cum = self.injector.getSteamVolume() * self.BARRELRATIO/self.MILLIONS
+        if cummulativeSteamVolume == 0:
+            cummulativeSteamVolume = cum
+        else:
+            cummulativeSteamVolume += cum
+        return(cummulativeSteamVolume)
+
 
     # cummulative steam produced
     def cummulativeSteamVolume(self, cummulativeSteamVolume):
@@ -74,10 +83,14 @@ class Sagd:
         rate = self.production.getWaterVolume()/self.well.daysPerMonth()
         return(rate)
 
-    # barrel water per millions
-    def barrelWaterRatePM(self):
-        rate = self.production.getWaterVolume() * self.BARRELRATIO/self.MILLIONS
-        return(rate)
+    # cummulative barrel water mmbbl
+    def cummulativeBarrelWaterVolume(self, cummulativeWaterVolume):
+        cum = self.production.getWaterVolume() * self.BARRELRATIO/self.MILLIONS
+        if cummulativeWaterVolume == 0:
+            cummulativeWaterVolume = cum
+        else:
+            cummulativeWaterVolume += cum
+        return(cummulativeWaterVolume)
 
     # cummulative water produced
     def cummulativeWaterVolume(self, cummulativeWaterVolume):
@@ -87,11 +100,6 @@ class Sagd:
         else:
             cummulativeWaterVolume += cum
         return(cummulativeWaterVolume)
-
-    # water steam ratio
-    def waterSteamRatio(self):
-        rate = self.averageDailyWater()/self.averageDailySteam()
-        return(rate)
 
     # instantaneous steam oil ratio
     def steamOilRatio(self):
@@ -103,14 +111,19 @@ class Sagd:
         rate = self.cummulativeSteamVolume(cummulativeSteamVolume)/self.cummulativeOilVolume(cummulativeOilVolume)
         return(rate)
 
+    # cummulative barrel steam oil ratio
+    def cummulativeBarrelSteamOilRatio(self, cummulativeBarrelSteamVolume, cummulativeBarrelOilVolume):
+        rate = self.cummulativeBarrelSteamVolume(cummulativeBarrelSteamVolume)/self.cummulativeBarrelOilVolume(cummulativeBarrelOilVolume)
+        return(rate)
+
     # instantaneous water steam ratio
     def waterSteamRatio(self):
         rate = self.averageDailyWater()/self.averageDailySteam()
         return(rate)
 
-    # cummulative water steam ratio
-    def cummulativeWaterSteamRatio(self):
-        rate = self.barrelWaterRatePM()/self.barrelSteamRatePM()
+    # cummulative barrel water steam ratio
+    def cummulativeBarrelWaterSteamRatio(self, cummulativeBarrelWaterVolume, cummulativeBarrelSteamVolume):
+        rate = self.cummulativeBarrelWaterVolume(cummulativeBarrelWaterVolume)/self.cummulativeBarrelSteamVolume(cummulativeBarrelSteamVolume)
         return(rate)
 
     # injector uptime percent
@@ -131,6 +144,7 @@ class Sagd:
             percent = 1
         return(percent)
 
+    # display the sagd model
     def displaySagd(self):
         print(self.well.displayWell())
         print(self.injector.displayInjector())
@@ -148,15 +162,18 @@ print(sagd.well.daysPerMonth(), ': ', sagd.production.getOilVolume(),
       sagd.averageDailyWater(), sagd.cummulativeWaterVolume(0),
       sagd.waterSteamRatio(), sagd.steamOilRatio(), sagd.cummulativeSteamOilRatio(0, 0),
       sagd.injectorUptime(), sagd.producerUptime(), sagd.production.operatingTemperature(),
-      sagd.barrelOilRate(), sagd.barrelOilRatePM(),
-      sagd.barrelSteamRate(), sagd.barrelSteamRatePM(),
-      sagd.barrelWaterRatePM(), sagd.waterSteamRatio(), sagd.cummulativeWaterSteamRatio(),
+      sagd.barrelOilRate(), sagd.cummulativeBarrelOilVolume(0),
+      sagd.barrelSteamRate(), sagd.cummulativeBarrelSteamVolume(0),
+      sagd.cummulativeBarrelWaterVolume(0), sagd.cummulativeBarrelSteamOilRatio(0, 0), sagd.waterSteamRatio(), sagd.cummulativeBarrelWaterSteamRatio(0, 0),
       sagd.production.oilViscosity())
 
 print(sagd2.displaySagd())
+csv = sagd2.cummulativeBarrelSteamVolume(0.03902976); cwv = sagd2.cummulativeBarrelWaterVolume(0.03249581)
 print(sagd2.well.daysPerMonth(), ': ', sagd2.production.getOilVolume(),
       ': ', sagd2.averageDailyOilRate(), sagd2.cummulativeOilVolume(165),
       sagd2.cummulativeSteamVolume(5143), sagd2.cummulativeWaterVolume(3956),
       sagd2.steamOilRatio(), sagd2.cummulativeSteamOilRatio(5143, 165),
       sagd2.injectorUptime(), sagd2.producerUptime(), sagd2.production.operatingTemperature(),
-      sagd2.barrelOilRate(), sagd.barrelOilRatePM())
+      sagd2.barrelOilRate(), sagd2.cummulativeBarrelOilVolume(0.00218),
+      sagd2.cummulativeBarrelSteamVolume(0.03902976), sagd2.cummulativeBarrelWaterVolume(0.03249581),
+      sagd.cummulativeBarrelWaterSteamRatio(cwv, csv))

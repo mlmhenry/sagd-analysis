@@ -8,10 +8,14 @@ Created on Wed Oct 19 13:25:54 2016
 # from volume import Volume
 # from online import Online
 # from presure import Presure
-from fluid import Fluid
+from properties.fluid import Fluid
 
 
 class Production:
+
+    # constants
+    STEAM_CORR = 33.68306
+    POWER = 0.24198
 
     def __init__(self, waterVolume, oilVolume, online, presure):
 #        self.waterVolume = Volume(waterVolume)
@@ -20,9 +24,6 @@ class Production:
 #        self.operatingPresure = Presure(presure)
         self.fluid = Fluid()
 
-        self.STEAMCORR = 33.68306
-        self.POWER = 0.24198
-        
         self.waterVolume = waterVolume
         self.oilVolume = oilVolume
         self.producerOnline = online
@@ -57,7 +58,7 @@ class Production:
         self.operatingPresure = presure
 
     def operatingTemperature(self):
-        temperature = self.STEAMCORR * self.operatingPresure**self.POWER
+        temperature = self.STEAM_CORR * self.operatingPresure**self.POWER
         return(temperature)
 
     def oilViscosity(self):
