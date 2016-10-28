@@ -6,13 +6,13 @@ Created on Thu Oct 20 17:01:27 2016
 """
 
 
-class Presure:
+class Pressure:
 
     def __init__(self, value):
         self.value = value
         self.unit = 'kPa'
 
-    # operating presure
+    # operating pressure
     def getValue(self):
         return(self.value)
 

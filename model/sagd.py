@@ -12,13 +12,14 @@ from model.production import Production
 
 class Sagd:
 
+    # contants
     HOURSPERDAY = 24
     BARRELRATIO = 6.29
     MILLIONS = 1000000
 
-    def __init__(self, name, date, steamVolume, injectorOnline, waterVolume, oilVolume, online, presure):
+    def __init__(self, name, date, steamVolume, injectorOnline, waterVolume, oilVolume, online, pressure):
         self.well = Well(name, date)
-        self.production = Production(waterVolume, oilVolume, online, presure)
+        self.production = Production(waterVolume, oilVolume, online, pressure)
         self.injector = Injector(steamVolume, injectorOnline)
 
     # average daily oil rate

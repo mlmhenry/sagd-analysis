@@ -7,7 +7,7 @@ Created on Wed Oct 19 13:25:54 2016
 
 # from volume import Volume
 # from online import Online
-# from presure import Presure
+from model.pressure import Pressure
 from properties.fluid import Fluid
 
 
@@ -17,17 +17,19 @@ class Production:
     STEAM_CORR = 33.68306
     POWER = 0.24198
 
-    def __init__(self, waterVolume, oilVolume, online, presure):
+    def __init__(self, waterVolume, oilVolume, online, pressure):
 #        self.waterVolume = Volume(waterVolume)
 #        self.oilVolume = Volume(oilVolume)
 #        self.online = Online(online)
-#        self.operatingPresure = Presure(presure)
+#        self.operatingPresure = Pressure(pressure)
+
+        # fluid properties
         self.fluid = Fluid()
 
         self.waterVolume = waterVolume
         self.oilVolume = oilVolume
         self.producerOnline = online
-        self.operatingPresure = presure
+        self.operatingPressure = pressure
 
     # water volume produced
     def getWaterVolume(self):
@@ -51,19 +53,19 @@ class Production:
         self.producerOnline = online
 
     # operating pressure
-    def getOperatingPresure(self):
-        return(self.operatingPresure)
+    def getOperatingPressure(self):
+        return(self.operatingPressure)
 
-    def setOperatingPresure(self, presure):
-        self.operatingPresure = presure
+    def setOperatingPressure(self, pressure):
+        self.operatingPressure = pressure
 
     def operatingTemperature(self):
-        temperature = self.STEAM_CORR * self.operatingPresure**self.POWER
+        temperature = self.STEAM_CORR * self.operatingPressure**self.POWER
         return(temperature)
 
     def oilViscosity(self):
-        viscosity = self.fluid.getPropA() * self.operatingPresure**-self.fluid.getPropB()
+        viscosity = self.fluid.getPropA() * self.operatingPressure**-self.fluid.getPropB()
         return(viscosity)
 
     def displayProduction(self):
-        print(self.waterVolume, ': ', self.oilVolume, ': ', self.producerOnline, ': ', self.operatingPresure)
+        print(self.waterVolume, ': ', self.oilVolume, ': ', self.producerOnline, ': ', self.operatingPressure)

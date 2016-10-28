@@ -23,7 +23,7 @@ class Injector:
         return(self.steamVolume.getValue())
 
     def setSteamVolume(self, volume):
-        self.steamVolume = volume
+        self.steamVolume.setValue(volume)
 
     def getSteamVolumeUnit(self):
         return(self.steamVolume.getUnit())
@@ -33,7 +33,7 @@ class Injector:
         return(self.injectorOnline.getValue())
 
     def setInjectorOnline(self, online):
-        self.injectorOnline = online
+        self.injectorOnline.setValue(online)
 
     def getInjectorOnlineUnit(self):
         return(self.steamVolume.getUnit())

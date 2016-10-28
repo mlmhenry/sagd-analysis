@@ -6,8 +6,8 @@ Created on Fri Oct 21 15:06:16 2016
 """
 
 import math
-import operator
-import functools
+#import operator
+#import functools
 
 from model.sagd import Sagd
 # from model.readData import ReadData
@@ -19,7 +19,7 @@ class OilRateParameters:
 
     # constants
     BUTLER_PEAK_OIL_RATE = 1.30  # FF_P
-    ACCELERATIONDUETOGRAVITY = 9.81  # m*s^-2 g
+    ACCELERATION_DUE_TO_GRAVITY = 9.81  # m*s^-2 g
     SECONDS_PER_DAY = 60*60*24  # spd
     PERMEABILITY_DARCIES_TO_M2 = 9.87E-13  # m^2D^-1 Kconv
     BUTLER_EDGE = 2.85E-06
@@ -32,7 +32,7 @@ class OilRateParameters:
 #        self.inputOilData = InputOilParameters()
 
         # model description
-        self.averageOperatingPresure = 3207  # Pop
+        self.averageOperatingPressure = 3207  # Pop
         self.averageOperatingTemperure = 238  # E6
         self.subCool = 10  # Tsc_P
         self.offset = 2
@@ -58,16 +58,16 @@ class OilRateParameters:
         self.isorCutoff = 100  # m3/m3
         self.residualAngle = 7
         self.wellPairs = 1
-        self.eurVolume = 3.148
-        self.obip = 4.72
+        self.eurVolume = 3.148 ###
+        self.obip = 4.72 ###
 
-#        self.sagd = Sagd(name, date, steamVolume, injectorOnline, waterVolume, oilVolume, online, presure)
+#        self.sagd = Sagd(name, date, steamVolume, injectorOnline, waterVolume, oilVolume, online, pressure)
 #        self.model = ReadData(8, 75)
 
-    def sumproduct(*lists):
-        return sum(functools.reduce(operator.mul, data) for data in zip(*lists))
+#    def sumproduct(*lists):
+#        return sum(functools.reduce(operator.mul, data) for data in zip(*lists))
 
-    # reservoir height
+    # height of reservoir top above producer
     def reservoirHeight(self):
         height = self.grossSteamableHeight - self.averageWedgeThickness()
         return(height)
@@ -88,31 +88,25 @@ class OilRateParameters:
         rate = self.averageDrainageArea/self.averageHorizontalWellLength/self.wellPairs
         return(rate)
 
-    # average operating pressure (historical kPa) ###
-    def averageOperatingPressure(self):
-        # sum(l)/len(l)
-        average = sum(self.model.historicalOperatingPresures())/len(self.modelself.model.historicalOperatingPresures())
-        return(average)
-
-    # mean viscosity reference pressure ###
-    def mvsReferencePressure(self):
-        # a(pR/r)**b
-        refPressure = self.fluid.getPropA() * (self.sumproduct(self.production.operatingPresure,self.sagd.averageDailyOilRate())/sum(self.sagd.averageDailyOilRate()))**-self.fluid.getPropB()
-        return(refPressure)
-
-    # producible recovery factor
+    # producible recovery factor ###
     def producibleRecoveryFactor(self):
         factor = (self.eurVolume/self.obip)*100
         return(factor)
 
-    # current production ###
-    def currentProduction(self):
-        volume = max(self.sagd.cummulativeBarrelOilVolume())
-        return(volume)
+    # average operating pressure (historical kPa) ###
+#    self.model.getAverageOperatingPressure()
+
+    # current production oil volume mmbbl ###
+#    self.model.productionMaxOilVolume()
+
+    # mean viscosity at reference pressure ###
+#    self.model.mvsReferencePressure()
+
+
 
 res = OilRateParameters()
 print('reservoir parameters')
-print(res.reservoirHeight(), res.SECONDSPERDAY)
+print(res.reservoirHeight(), res.SECONDS_PER_DAY)
 print('oil rate parameters')
 print(res.averageWedgeThickness(), res.horizontalWellSpacing(), res.producibleRecoveryFactor())
-# sagd = Sagd(name, date, steamVolume, injectorOnline, waterVolume, oilVolume, online, presure)
+# sagd = Sagd(name, date, steamVolume, injectorOnline, waterVolume, oilVolume, online, pressure)

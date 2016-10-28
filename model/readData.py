@@ -11,6 +11,8 @@ from collections import namedtuple
 from model.sagd import Sagd
 from utilities.utils import Utils
 from historicalProduction import HistoricalProduction
+from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
+from readForecastData import ReadForecastData
 
 
 class ReadData:
@@ -21,31 +23,35 @@ class ReadData:
        'C:/Users/502677886/Documents/GE GOp/L5P7_SAGDAM_ST_V10.9.6.3.xlsm',
        on_demand = True)
     worksheet = workbook.sheet_by_index(0)
+    forecastsheet = workbook.sheet_by_index(6)
+
     field = []   # The row where we stock the name of the column
     unit = []   # The row where we stock the unit of the column
     data = []
     sagdTable = sagdTable = []
+    forcastPressure = []
 
     # historical production
-    productionPresure = []
+    productionPressure = []
     productionOilRate = []
     productionOilVolume = []
     productionSteamVolume = []
     productionWaterVolume = []
-    productionRate = 0.0
-    averageOperatingPresure = 0.0
-    currentOperatingPresure = 0.0
+
 
     def __init__(self, ncols, nrows):
         self.ncols = ncols
         self.nrows = nrows
+
+        # forecast data
+        self.fP = []
 
     def fetchHeader(self):
         for col in range(self.ncols):
             self.field.append(self.worksheet.cell_value(1, col))
             self.unit.append(self.worksheet.cell_value(2, col))
 
-    # transform the workbook to a list of dictionaries
+    # transform the workbook to a sagd model (a list of dictionaries)
     def fetchCells(self, nrows, ncols, field, worksheet):
         for row in range(3, nrows):
             elm = {}
@@ -59,11 +65,11 @@ class ReadData:
             water_volume = elm[field[4]] = worksheet.cell_value(row, 4)
             oil_volume = elm[field[2]] = worksheet.cell_value(row, 2)
             production_online = elm[field[6]] = worksheet.cell_value(row, 6)
-            presure = elm[field[7]] = worksheet.cell_value(row, 7)
+            pressure = elm[field[7]] = worksheet.cell_value(row, 7)
 
             sagd = Sagd(pad_name, pad_date, steam_volume, injector_online,
                         water_volume, oil_volume, production_online,
-                        presure)
+                        pressure)
             self.sagdTable.append(sagd)
 
 #                elm[field[col]] = worksheet.cell_value(row, col)
@@ -98,16 +104,25 @@ class ReadData:
             self.productionSteamVolume.append(steamVolume)
             self.productionWaterVolume.append(waterVolume)
             self.productionOilRate.append(cell.averageDailyOilRate())
-            self.productionPresure.append(cell.production.getOperatingPresure())
-            self.productionRate = max(self.productionSteamVolume)/max(self.productionOilVolume)
-            self.currentOperatingPresure = Utils.sumproduct(sheet.productionPresure, sheet.productionOilRate)/sum(sheet.productionOilRate)
-            self.averageOperatingPresure = Utils.avg(self.productionPresure)
+            self.productionPressure.append(cell.production.getOperatingPressure())
 
-    def getCurrentOperatingPresure(self):
-        return(self.currentOperatingPresure)
+    # transform the workbook to a sagd model
+    def fetchForecastCells(self, nrows, ncols, worksheet):
+        for row in range(33, nrows):
+            dateOfChange = worksheet.cell_value(row, 12)
+            pressure = worksheet.cell_value(row, 13)
+            forcastPressure = ForecastedOperatingPressure(dateOfChange, pressure)
+            self.forcastPressure.append(forcastPressure)
 
-    def maxProductionOilVolume(self):
-        return(max(self.productionOilVolume))
+    def fetchForcastData(self, rows):
+        ReadData.fetchForecastCells(
+            self, rows, self.ncols, self.forecastsheet)
+
+    # forecast pressure (kPa)
+    def getForecastPressure(self):
+        for cell in self.forcastPressure:
+            self.fP.append(cell.getOperatingPressure())
+        return(self.fP)
 
 # main program starts here
 sheet = ReadData(8, 75)
@@ -125,41 +140,23 @@ print(sagdSheet._fields)
 # print(cell.displaySagd())
 print("Sheet sagdTable")
 print(sheet.sagdTable[0].production.getOilVolume())
-productionPresure = []
-productionOilRate = []
-productionOilVolume = []
-productionSteamVolume = []
-productionWaterVolume = []
-productionRate = 0.0
-oilVolume = 0
-waterVolume = 0
-steamVolume = 0
-for cell in sheet.sagdTable:
-    if not productionOilVolume:
-        oilVolume = cell.cummulativeBarrelOilVolume(0)
-    else:
-        oilVolume = cell.cummulativeBarrelOilVolume(productionOilVolume.pop())
 
-    if not productionSteamVolume:
-        steamVolume = cell.cummulativeBarrelSteamVolume(0)
-    else:
-        steamVolume = cell.cummulativeBarrelSteamVolume(productionSteamVolume.pop())
-
-    if not productionWaterVolume:
-        waterVolume = cell.cummulativeBarrelWaterVolume(0)
-    else:
-        waterVolume = cell.cummulativeBarrelWaterVolume(productionWaterVolume.pop())
-
-    productionOilVolume.append(oilVolume)
-    productionSteamVolume.append(steamVolume)
-    productionWaterVolume.append(waterVolume)
-    productionOilRate.append(cell.averageDailyOilRate())
-    productionPresure.append(cell.production.getOperatingPresure())
-    productionRate = max(productionSteamVolume)/max(productionOilVolume)
-
-# print(sheet.productionOilVolume, sheet.productionPresure)
-print(model.getCurrentOperatingPresure(),
-      model.maxProductionOilVolume(), max(model.productionSteamVolume),
-      max(model.productionWaterVolume), model.productionRate, model.averageOperatingPresure)
+# print(sheet.productionOilVolume, sheet.productionPressure)
+print(model.getCurrentOperatingPressure(),
+      model.productionMaxOilVolume(), model.productionMaxSteamVolume(),
+      model.productionMaxWaterVolume(), model.getProductionRate(),
+      model.getAverageOperatingPressure(), model.getAverageProductionUptime(),
+      model.mvsReferencePressure())
 #for value in iter(sagdSheet._fields):
 #    print(value.__getitem__, ', ')
+
+fsheet = ReadForecastData()
+fsheet.fetchForcastData(40)
+#print(fsheet.getForecastPressure())
+#sheet.fetchForcastData(40)
+#print(model.getProductionPressure())
+#print(sheet.getForecastPressure())
+#print(model.getProductionPressure() + sheet.getForecastPressure())
+print(fsheet.getForecastPressure())
+print(fsheet.getFullProfilePressure(model.getProductionPressure()))
+#print(model.getAverageFullProfilePressure(model.getProductionPressure() + sheet.getForecastPressure()))
