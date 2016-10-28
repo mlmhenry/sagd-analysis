@@ -9,9 +9,9 @@ import xlrd
 from collections import namedtuple
 
 from model.sagd import Sagd
-from utilities.utils import Utils
+# from utilities.utils import Utils
 from historicalProduction import HistoricalProduction
-from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
+#from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
 from readForecastData import ReadForecastData
 
 

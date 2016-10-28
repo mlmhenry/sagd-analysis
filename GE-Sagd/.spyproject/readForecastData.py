@@ -7,14 +7,13 @@ Created on Thu Oct 27 12:52:25 2016
 
 import xlrd
 
-from constants.const import Const
+from model.constants.const import Const
 from model.well import Well
 from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
 
 
 class ReadForecastData:
 
-    DEFAULT_PAD = 'L1P1'
     CONST = Const()
 
     workbook = xlrd.open_workbook(

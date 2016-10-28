@@ -8,7 +8,7 @@ Created on Wed Oct 19 13:25:54 2016
 # from volume import Volume
 # from online import Online
 from model.pressure import Pressure
-from properties.fluid import Fluid
+from model.properties.fluid import Fluid
 
 
 class Production:

@@ -5,8 +5,8 @@ Created on Wed Oct 26 12:35:27 2016
 @author: 502677886
 """
 
-from utilities.utils import Utils
-from properties.fluid import Fluid
+from model.utilities.utils import Utils
+from model.properties.fluid import Fluid
 from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
 
 class HistoricalProduction:

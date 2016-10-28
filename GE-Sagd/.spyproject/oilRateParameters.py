@@ -10,7 +10,7 @@ import math
 #import functools
 
 from model.sagd import Sagd
-# from model.readData import ReadData
+from model.readData import ReadData
 from inputOil.matchOilParameters import MatchOilParameters
 from inputOil.inputOilParameters import InputOilParameters
 
