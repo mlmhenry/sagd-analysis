@@ -11,7 +11,7 @@ from collections import namedtuple
 from model.sagd import Sagd
 # from utilities.utils import Utils
 from historicalProduction import HistoricalProduction
-#from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
+from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
 from readForecastData import ReadForecastData
 
 
@@ -23,7 +23,7 @@ class ReadData:
        'C:/Users/502677886/Documents/GE GOp/L5P7_SAGDAM_ST_V10.9.6.3.xlsm',
        on_demand = True)
     worksheet = workbook.sheet_by_index(0)
-    forecastsheet = workbook.sheet_by_index(6)
+    forecastsheet = workbook.sheet_by_index(5)
 
     field = []   # The row where we stock the name of the column
     unit = []   # The row where we stock the unit of the column
@@ -106,13 +106,15 @@ class ReadData:
             self.productionOilRate.append(cell.averageDailyOilRate())
             self.productionPressure.append(cell.production.getOperatingPressure())
 
-    # transform the workbook to a sagd model
-    def fetchForecastCells(self, nrows, ncols, worksheet):
-        for row in range(33, nrows):
-            dateOfChange = worksheet.cell_value(row, 12)
-            pressure = worksheet.cell_value(row, 13)
-            forcastPressure = ForecastedOperatingPressure(dateOfChange, pressure)
-            self.forcastPressure.append(forcastPressure)
+#    # transform the workbook to a sagd model
+#    def fetchForecastCells(self, nrows, ncols, worksheet):
+#        for row in range(27, nrows):
+##            dateOfChange = worksheet.cell_value(row, 12)
+#            dateFrom = worksheet.cell_value(row, 15)
+#            dateTo = worksheet.cell_value(row, 16)
+#            pressure = worksheet.cell_value(row, 13)
+#            forcastPressure = ForecastedOperatingPressure(dateFrom, dateTo, pressure)
+#            self.forcastPressure.append(forcastPressure)
 
     def fetchForcastData(self, rows):
         ReadData.fetchForecastCells(
@@ -151,12 +153,18 @@ print(model.getCurrentOperatingPressure(),
 #    print(value.__getitem__, ', ')
 
 fsheet = ReadForecastData()
-fsheet.fetchForcastData(40)
+fsheet.fetchForcastData(34)
 #print(fsheet.getForecastPressure())
 #sheet.fetchForcastData(40)
 #print(model.getProductionPressure())
 #print(sheet.getForecastPressure())
 #print(model.getProductionPressure() + sheet.getForecastPressure())
 print(fsheet.getForecastPressure())
-print(fsheet.getFullProfilePressure(model.getProductionPressure()))
-#print(model.getAverageFullProfilePressure(model.getProductionPressure() + sheet.getForecastPressure()))
+print(fsheet.getForecastUptime())
+
+model.setFullProfilePressure(fsheet.getFullProfilePressure(model.getProductionPressure()))
+print(model.getAverageFullProfilePressure())
+
+model.setFullProfileUptime(fsheet.getFullProfileUptime(model.getProducerUptime()))
+print(model.getAverageFullProfileUptime())
+print(model.getAverageOperatingTemperature())

@@ -5,11 +5,15 @@ Created on Wed Oct 26 12:35:27 2016
 @author: 502677886
 """
 
+from model.constants.const import Const
 from model.utilities.utils import Utils
 from model.properties.fluid import Fluid
 from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
 
 class HistoricalProduction:
+
+    # constants
+    CONST = Const()
 
     def __init__(self, sagdTable):
 
@@ -23,6 +27,9 @@ class HistoricalProduction:
         self.productionSteamVolume = []
         self.productionWaterVolume = []
         self.productionUptime = []
+
+        self.fullProfilePressure = []
+        self.fullProfileUptime = []
 
         # fluid properties
         self.fluid = Fluid()
@@ -58,11 +65,11 @@ class HistoricalProduction:
             self.productionUptime.append(cell.producerUptime())
 
 
-    def forcast(self, dateOfChange, operatingPressure):
-
-        self.forcastPressure = ForecastedOperatingPressure(dateOfChange, operatingPressure)
-        self.forcastPressure.getOperatingPressure()
-#        cell.production.setOperatingPressure(self.forcastPressure.)
+#    def forcast(self, dateOfChange, operatingPressure):
+#
+#        self.forcastPressure = ForecastedOperatingPressure(dateOfChange, operatingPressure)
+#        self.forcastPressure.getOperatingPressure()
+##        cell.production.setOperatingPressure(self.forcastPressure.)
 
     # current production oil volume mmbbl
     def productionMaxOilVolume(self):
@@ -92,6 +99,10 @@ class HistoricalProduction:
     def getAverageProductionUptime(self):
         return(Utils.avg(self.productionUptime))
 
+    # producer Uptime (historical %/100)
+    def getProducerUptime(self):
+        return(self.productionUptime)
+
     # mean viscosity at reference pressure
     def mvsReferencePressure(self):
         # a(pR/r)**b
@@ -103,6 +114,23 @@ class HistoricalProduction:
         return(self.productionPressure)
 
     # average operating pressure (full profile kPa)
-    def getAverageFullProfilePressure(self, fullProfilePressure):
-        return(Utils.avg(fullProfilePressure))
+    def getAverageFullProfilePressure(self):
+        return(Utils.avg(self.fullProfilePressure))
+
+    # average operating pressure (full profile kPa)
+    def setFullProfilePressure(self, fullProfilePressure):
+        self.fullProfilePressure = fullProfilePressure
+
+    # average producer uptime (full profile %/100)
+    def getAverageFullProfileUptime(self):
+        return(Utils.avg(self.fullProfileUptime))
+
+    # average producer uptime (full profile %/100)
+    def setFullProfileUptime(self, fullProfileUptime):
+        self.fullProfileUptime = fullProfileUptime
+
+    # average operating temperature (C Top)
+    def getAverageOperatingTemperature(self):
+        operatingTemperature = self.CONST.STEAM_CORR * self.getAverageFullProfilePressure()**self.CONST.POWER
+        return(operatingTemperature)
 

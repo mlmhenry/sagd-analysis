@@ -5,29 +5,23 @@ Created on Tue Oct 25 10:34:19 2016
 @author: 502677886
 """
 
-import datetime
 
 from model.constants.const import Const
 from model.well import Well
 from model.pressure import Pressure
 
 
-class ForecastedOperatingPressure:
+class ForecastedProducerUptime:
 
     CONST = Const()
 
-    def __init__(self, dateFrom, dateTo, operatingPressure):
+    def __init__(self, dateFrom, dateTo, uptime):
 
         # forecaated operating pressure
 #        self.dateOfChange = Well(self.CONST.DEFAULT_PAD, dateOfChange)
         self.dateFrom = Well(self.CONST.DEFAULT_PAD, dateFrom)
         self.dateTo = Well(self.CONST.DEFAULT_PAD, dateTo)
-        self.operatingPressure = Pressure(operatingPressure)
-
-#    # date yyyy-mm-dd
-#    def getDate(self):
-#        wellDate = datetime.date.fromordinal(self.dateoffset + int(self.date))
-#        return(wellDate)
+        self.uptime = Pressure(uptime)
 
     def getDateTo(self):
         return(self.dateTo)
@@ -47,8 +41,8 @@ class ForecastedOperatingPressure:
     def setDateOfChange(self, dateOfChange):
         self.dateOfChange = dateOfChange
 
-    def getOperatingPressure(self):
-        return(self.operatingPressure.getValue())
+    def getProducerUptime(self):
+        return(self.uptime.getValue())
 
-    def setOperatingPressure(self, operatingPressure):
-        self.operatingPressure.setValue(operatingPressure)
+    def setProducerUptime(self, uptime):
+        self.uptime.setValue(uptime)

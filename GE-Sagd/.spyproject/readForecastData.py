@@ -10,6 +10,7 @@ import xlrd
 from model.constants.const import Const
 from model.well import Well
 from inputOil.forecastedOperatingPressure import ForecastedOperatingPressure
+from inputOil.forecastedProducerUptime import ForecastedProducerUptime
 
 
 class ReadForecastData:
@@ -21,7 +22,7 @@ class ReadForecastData:
     workbook = xlrd.open_workbook(
        'C:/Users/502677886/Documents/GE GOp/L5P7_SAGDAM_ST_V10.9.6.3.xlsm',
        on_demand = True)
-    forecastsheet = workbook.sheet_by_index(6)
+    forecastsheet = workbook.sheet_by_index(5)
 
     def __init__(self):
 
@@ -31,16 +32,26 @@ class ReadForecastData:
 
         # forecaste data
         self.forcastPressure = []
+        self.forcastUptime = []
 
-    # transform the workbook to a sagd model
+    # transform the worksheet to a sagd model
     def fetchForecastCells(self, nrows, worksheet):
-        for row in range(33, nrows):
-            dateOfChange = worksheet.cell_value(row, 12)
-            pressure = worksheet.cell_value(row, 13)
+        for row in range(27, nrows):
+#            dateOfChange = worksheet.cell_value(row, 12)
+            dateFrom = worksheet.cell_value(row, 14)
+            dateTo = worksheet.cell_value(row, 15)
+            pressure = worksheet.cell_value(row, 16)
+
+            dateFromUptime = worksheet.cell_value(row, 18)
+            dateToUptime = worksheet.cell_value(row, 19)
+            uptime = worksheet.cell_value(row, 20)
 
             # list forecast data
-            forcastPressure = ForecastedOperatingPressure(dateOfChange, pressure)
+            forcastPressure = ForecastedOperatingPressure(dateFrom, dateTo, pressure)
             self.forcastPressure.append(forcastPressure)
+
+            forcastUptime = ForecastedProducerUptime(dateFromUptime, dateToUptime, uptime)
+            self.forcastUptime.append(forcastUptime)
 
     def fetchForcastData(self, rows):
         ReadForecastData.fetchForecastCells(
@@ -58,16 +69,51 @@ class ReadForecastData:
     # full profile pressure (kPa)
     def getFullProfilePressure(self, historicalPressure):
         self.fP = historicalPressure
-        n = 0
 
         # list full profile pressure
         for cell in self.forcastPressure:
-            nrows = self.well.getFormatedDate().month - cell.getDateOfChange().getFormatedDate().month
-            if n > 0:
-                nrows += 1
+#            nrows = self.well.getFormatedDate().month - cell.getDateOfChange().getFormatedDate().month
+            nrows = (cell.getDateTo().getFormatedDate() - cell.getDateFrom().getFormatedDate()).days
+
+            # number of days to number on months
+            if nrows > 365:
+                nrows = int(nrows/365*12) + 1
             else:
-                n += 1
+                nrows = int(nrows/28) - 1
+
+            # one row per month
             for row in range(0, nrows):
                 self.fP.append(cell.getOperatingPressure())
 
         return(self.fP)
+
+    # forecast producer uptime (%/100)
+    def getForecastUptime(self):
+        self.fP = []
+
+        # list forecast uptime
+        for cell in self.forcastUptime:
+            self.fP.append(cell.getProducerUptime())
+        return(self.fP)
+
+    # full profile uptime (%/100)
+    def getFullProfileUptime(self, historicalUptime):
+        self.ft = historicalUptime
+
+        # list full profile uptime
+        for cell in self.forcastUptime:
+#            nrows = self.well.getFormatedDate().month - cell.getDateOfChange().getFormatedDate().month
+            nrows = (cell.getDateTo().getFormatedDate() - cell.getDateFrom().getFormatedDate()).days
+
+            # number of days to number on months
+            if nrows > 365:
+                nrows = int(nrows/365*12) + 1
+            else:
+                nrows = int(nrows/28) - 1
+
+            # one row per month
+            for row in range(0, nrows):
+                self.ft.append(cell.getProducerUptime())
+
+        return(self.ft)
+

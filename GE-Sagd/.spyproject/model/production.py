@@ -7,6 +7,7 @@ Created on Wed Oct 19 13:25:54 2016
 
 # from volume import Volume
 # from online import Online
+from model.constants.const import Const
 from model.pressure import Pressure
 from model.properties.fluid import Fluid
 
@@ -14,8 +15,9 @@ from model.properties.fluid import Fluid
 class Production:
 
     # constants
-    STEAM_CORR = 33.68306
-    POWER = 0.24198
+#    STEAM_CORR = 33.68306
+#    POWER = 0.24198
+    CONST = Const()
 
     def __init__(self, waterVolume, oilVolume, online, pressure):
 #        self.waterVolume = Volume(waterVolume)
@@ -60,7 +62,7 @@ class Production:
         self.operatingPressure = pressure
 
     def operatingTemperature(self):
-        temperature = self.STEAM_CORR * self.operatingPressure**self.POWER
+        temperature = self.CONST.STEAM_CORR * self.operatingPressure**self.CONST.POWER
         return(temperature)
 
     def oilViscosity(self):
